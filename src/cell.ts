@@ -1,6 +1,5 @@
 import { Container, Graphics } from "pixi.js";
 
-export const CELL_SIZE = 20;
 type CellState = 'DEAD' | 'ALIVE';
 
 export class Cell extends Container {
@@ -15,13 +14,9 @@ export class Cell extends Container {
     public readonly row: number
   ) {
     super();
-    this._stroke = this.addChild(new Graphics()
-      .rect(0, 0, CELL_SIZE, CELL_SIZE)
-      .stroke({ width: 1, color: 0x222222 }));
+    this._stroke = this.addChild(new Graphics());
 
-    this._fill = this.addChild(new Graphics()
-      .rect(0, 0, CELL_SIZE, CELL_SIZE)
-      .fill({ color: 0xffffff }));
+    this._fill = this.addChild(new Graphics());
     this._fill.alpha = 0;
 
     this.eventMode = 'static';
@@ -67,6 +62,30 @@ export class Cell extends Container {
   public update() {
     this.setState(this._nextState);
     this._fill.alpha = this.state === 'ALIVE' ? 1 : 0;
+  }
+
+  /**
+   * resize
+   */
+  public resize(width: number, height: number) {
+    this._stroke.clear()
+      .rect(0, 0, width, height)
+      .stroke({ width: 1, color: 0x222222 });
+
+    this._fill.clear()
+      .rect(0, 0, width, height)
+      .fill({ color: 0xffffff });
+  }
+
+  /**
+   * color
+   */
+  public color(value: number) {
+    const fillWidth = this._fill.width;
+    const fillHeight = this._fill.height;
+    this._fill.clear()
+      .rect(0, 0, fillWidth, fillHeight)
+      .fill({ color: value });
   }
 
   public get state(): CellState {
