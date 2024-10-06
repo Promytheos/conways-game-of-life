@@ -4,8 +4,8 @@ export const CELL_SIZE = 20;
 type CellState = 'DEAD' | 'ALIVE';
 
 export class Cell extends Container {
-  public state: CellState = 'DEAD';
-  private nextState: CellState = 'DEAD';
+  private _nextState: CellState = 'DEAD';
+  private _state: CellState = 'DEAD';
 
   private readonly _fill: Graphics;
   private readonly _stroke: Graphics;
@@ -51,21 +51,29 @@ export class Cell extends Container {
    */
   private setState(state: CellState) {
     this.state = state;
-    this.nextState = state;
+    this._nextState = state;
   }
 
   /**
    * queueState
    */
   public queueState(state: CellState) {
-    this.nextState = state;
+    this._nextState = state;
   }
 
   /**
    * update
    */
   public update() {
-    this.setState(this.nextState);
+    this.setState(this._nextState);
     this._fill.alpha = this.state === 'ALIVE' ? 1 : 0;
+  }
+
+  public get state(): CellState {
+    return this._state;
+  }
+
+  private set state(value: CellState) {
+    this._state = value;
   }
 }
