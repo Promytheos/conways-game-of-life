@@ -8,28 +8,48 @@ export class Cell extends Container {
   private nextState: CellState = 'DEAD';
 
   private readonly _fill: Graphics;
+  private readonly _stroke: Graphics;
 
-  constructor() {
+  constructor(
+    public readonly column: number,
+    public readonly row: number
+  ) {
     super();
-    this._fill = new Graphics()
-      .rect(0, 0, CELL_SIZE, CELL_SIZE)
-      .fill({ color: 0xffffff });
-    this._fill.alpha = 0;
-
-    this.addChild(new Graphics()
+    this._stroke = this.addChild(new Graphics()
       .rect(0, 0, CELL_SIZE, CELL_SIZE)
       .stroke({ width: 1, color: 0x222222 }));
 
-    this.addChild(this._fill);
+    this._fill = this.addChild(new Graphics()
+      .rect(0, 0, CELL_SIZE, CELL_SIZE)
+      .fill({ color: 0xffffff }));
+    this._fill.alpha = 0;
 
     this.eventMode = 'static';
     this.cursor = 'pointer';
   }
 
   /**
+   * play
+   */
+  public play() {
+    this.cursor = 'default';
+    this.eventMode = 'none';
+    this._stroke.visible = false;
+  }
+
+  /**
+   * stop
+   */
+  public stop() {
+    this.cursor = 'pointer';
+    this.eventMode = 'static';
+    this._stroke.visible = true;
+  }
+
+  /**
    * setState
    */
-  public setState(state: CellState) {
+  private setState(state: CellState) {
     this.state = state;
     this.nextState = state;
   }
