@@ -9,6 +9,7 @@ await app.init({
   resizeTo: window
 });
 document.body.appendChild(app.canvas);
+app.canvas.setAttribute('style', 'display: block');
 
 const DEFAULT_UNIVERSE_SIZE = 100;
 const DEFAULT_UNIVERSE_COLOR = 0x000000;
@@ -33,15 +34,15 @@ const values = {
 resizeUniverse(DEFAULT_UNIVERSE_SIZE);
 
 window.onkeydown = (event) => {
-  if (event.key === ' ') {
+  if ([' ', 'k'].includes(event.key)) {
     values.isStarted ? stop() : start();
   }
 
-  if (event.key === '+' || event.key === '=') {
+  if (['+', '=', 'l'].includes(event.key)) {
     if (values.tickRate.FPS < values.tickRate.max) values.tickRate.FPS += 1;
   }
 
-  if (event.key === '-' || event.key === '_') {
+  if (['-', '_', 'j'].includes(event.key)) {
     if (values.tickRate.FPS > values.tickRate.min) values.tickRate.FPS -= 1;
   }
 }
