@@ -23,40 +23,6 @@ export function getRandomColor(): string {
   return `#${hexR}${hexG}${hexB}`;
 }
 
-export function calculateParallax(maxValue: number, distance: number, vanishingPoint: number): number {
-  const angle = Math.atan2(maxValue, vanishingPoint);
-  return (vanishingPoint - distance) * Math.tan(angle);
-}
-
-export function getYVector(currentAngle: number, maxValue: number): number {
-  const cosVal = Math.cos(currentAngle);
-  const magnitude = maxValue * cosVal;
-
-  if (Math.abs(magnitude) > maxValue) {
-    throw new Error(`What the fuck happened here?
-Magnitude:    ${magnitude}
-currentAngle: ${currentAngle}
-cosVal:       ${cosVal}
-xComp:        ${maxValue}`);
-  }
-
-  return magnitude;
-}
-
-export function getXVector(currentAngle: number, maxValue: number): number {
-  const sinVal = Math.sin(currentAngle);
-  const magnitude = maxValue * sinVal;
-
-  if (Math.abs(magnitude) > maxValue) {
-    throw new Error(`What the fuck happened here?
-Magnitude:    ${magnitude}
-currentAngle: ${currentAngle}
-sinVal:       ${sinVal}
-yComp:        ${maxValue}`);
-  }
-  return magnitude;
-}
-
 export function unwrap<T>(value: T | undefined, errorMsg: string = ''): T {
   if (value == undefined) {
     throw errorMsg;
