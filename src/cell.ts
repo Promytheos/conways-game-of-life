@@ -18,27 +18,18 @@ export class Cell extends Container {
 
     this._fill = this.addChild(new Graphics());
     this._fill.alpha = 0;
-
-    this.eventMode = 'static';
-    this.cursor = 'pointer';
   }
 
-  /**
-   * play
-   */
-  public play() {
+  public enable() {
+    this.eventMode = 'static';
+    this.cursor = 'pointer';
+    this._stroke.visible = true;
+  }
+
+  public disable() {
     this.cursor = 'default';
     this.eventMode = 'none';
     this._stroke.visible = false;
-  }
-
-  /**
-   * stop
-   */
-  public stop() {
-    this.cursor = 'pointer';
-    this.eventMode = 'static';
-    this._stroke.visible = true;
   }
 
   /**
