@@ -1,6 +1,8 @@
 import { Application } from 'pixi.js';
 import { GUI } from 'dat.gui';
 import { Cell } from './cell';
+import { UI } from './ui';
+type CellCoOrds = { column: number, row: number };
 
 init();
 
@@ -22,7 +24,6 @@ async function init() {
 
   let cells: Array<Array<Cell>> = [];
   let timer = 0;
-  let livingCells: Array<{ column: number; row: number }> = [];
 
   const values = {
     universeSize: { width: DEFAULT_UNIVERSE_SIZE, height: DEFAULT_UNIVERSE_SIZE },
@@ -35,6 +36,21 @@ async function init() {
   };
 
   resizeUniverse(DEFAULT_UNIVERSE_SIZE);
+  const ui = new UI();
+  app.stage.addChild(ui);
+  ui.position.set(window.innerWidth - ui.width - 30, window.innerHeight - ui.height - 30);
+  app.renderer.on('resize', () => {
+    ui.position.set(window.innerWidth - ui.width - 30, window.innerHeight - ui.height - 30);
+  });
+
+  ui.startBtn.on('pointerup', () => {
+    values.isStarted ? stop() : start();
+  });
+
+  ui.stopBtn.on('pointerup', () => {
+    values.isStarted ? stop() : start();
+  });
+
 
   window.onkeydown = (event) => {
     if ([' ', 'k'].includes(event.key)) {
@@ -105,7 +121,7 @@ async function init() {
     'Clear Memory': () => clearMemory()
   }, 'Clear Memory');
   gui.add({
-    'Save State': () => storeState()
+    'Save State': () => saveState()
   }, 'Save State');
   gui.add({
     'Load State': () => {
@@ -127,11 +143,19 @@ async function init() {
 
   function clearMemory() {
     localStorage.clear();
-    livingCells = [];
   }
 
-  function storeState() {
-    const data = JSON.stringify(livingCells);
+  function saveState() {
+    const aliveCells: Array<CellCoOrds> = [];
+    for (let i = 0; i < cells.length; i++) {
+      for (let j = 0; j < cells[i].length; j++) {
+        const cell = cells[i][j];
+        if (cell.state === 'ALIVE') {
+          aliveCells.push({ column: cell.column, row: cell.row });
+        }
+      }
+    }
+    const data = JSON.stringify(aliveCells);
 
     window.localStorage.setItem('storedState', data);
   }
@@ -139,14 +163,13 @@ async function init() {
   function loadState() {
     const storedState = window.localStorage.getItem('storedState');
     if (storedState) {
-      livingCells = JSON.parse(storedState);
+      (<ReadonlyArray<CellCoOrds>>JSON.parse(storedState)).forEach(({ column, row }) => {
+        const cell = cells[column][row];
+        cell.queueState('ALIVE');
+        cell.update();
+      });
     }
 
-    livingCells.forEach(({ column, row }) => {
-      const cell = cells[column][row];
-      cell.queueState('ALIVE');
-      cell.update();
-    });
   }
 
   function start() {
@@ -189,7 +212,6 @@ async function init() {
           if (!values.isStarted) {
             cell.queueState(cell.state === 'ALIVE' ? 'DEAD' : 'ALIVE');
             cell.update();
-            if (cell.state === 'ALIVE') livingCells.push({ column: cell.column, row: cell.row });
           }
         });
 
@@ -277,12 +299,10 @@ async function init() {
       }
     }
 
-    livingCells = [];
     for (let col = 0; col < cells.length; col++) {
       for (let row = 0; row < cells[col].length; row++) {
         const cell = cells[col][row];
         cell.update();
-        cell.state === 'ALIVE' && livingCells.push({ column: col, row });
       }
     }
   });
